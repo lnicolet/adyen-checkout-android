@@ -36,12 +36,14 @@ import adyen.com.adyenuisdk.util.ColorUtil;
 
 /**
  * Created by andrei on 11/5/15.
+ * Edited by Luca Nicoletti on 10/11/16.
  */
 public class PaymentActivity extends Activity {
 
     private static final String tag = PaymentActivity.class.getSimpleName();
 
     private TextView mPaymentAmount;
+    private TextView mApplicationTitle;
     private RelativeLayout mPayButton;
     private LinearLayout mPaymentForm;
     private LinearLayout mMerchantLogo;
@@ -74,9 +76,27 @@ public class PaymentActivity extends Activity {
 
         mMainLayout = (LinearLayout)findViewById(R.id.main_layout);
 
+        mApplicationTitle = (TextView)findViewById(R.id.applicationTitle);
+        if (extras.containsKey("applicationTitle")){
+            mApplicationTitle.setText(extras.getString("applicationTitle"));
+        }
+
         mCreditCardNo = (AdyenEditText)findViewById(R.id.credit_card_no);
         mCreditCardExpDate = (AdyenEditText)findViewById(R.id.credit_card_exp_date);
         mCreditCardCvc = (AdyenEditText)findViewById(R.id.credit_card_cvc);
+
+        if (extras.containsKey("bgColor")){
+            mMerchantLogo.setBackgroundColor(extras.getInt("bgColor"));
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getWindow().setStatusBarColor(extras.getInt("bgColor")); //To make it a little darker
+            }
+        }
+
+        if (extras.containsKey("statusbarColor")){
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getWindow().setStatusBarColor(extras.getInt("statusbarColor")); //To make it a little darker
+            }
+        }
 
         mMerchantLogoImage = (ImageView)findViewById(R.id.merchantLogoImage);
         mMerchantLogoImage.setImageResource(extras.getInt("logo"));
@@ -85,12 +105,6 @@ public class PaymentActivity extends Activity {
         initPaymentButtonText();
         initPaymentButton();
         initAdyenEditTextListeners();
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().
-                setStatusBarColor(Color.parseColor(
-                        ColorUtil.changeColorHSB(getResources().getString(extras.getInt("backgroundColor")))));
-        }
     }
 
     @Override
@@ -144,12 +158,6 @@ public class PaymentActivity extends Activity {
         }
 
         private void initPaymentFragment() throws CheckoutRequestException {
-            if(checkoutRequest.getBrandColor() != 0) {
-                arguments.putInt("backgroundColor", checkoutRequest.getBrandColor());
-            } else {
-                throw new CheckoutRequestException("Brand color is not set! Please set the brand color.");
-            }
-
             if(checkoutRequest.getBrandLogo() != 0) {
                 arguments.putInt("logo", checkoutRequest.getBrandLogo());
             } else {
@@ -172,6 +180,31 @@ public class PaymentActivity extends Activity {
                 arguments.putString("token", checkoutRequest.getToken());
             } else {
                 throw new CheckoutRequestException("Token is not set! Please set the token.");
+            }
+
+            if (checkoutRequest.getTitle() != null ){
+                arguments.putString("applicationTitle", checkoutRequest.getTitle());
+            }
+
+            //To follow Android guidelines, main color & status bar color have to be "the same" with the
+            //statusbar color a little darker. That's why I'm doing this. I removed the Brand color. Not necessary anymore.
+            if (checkoutRequest.getBackgroundColor() != null){
+                try {
+                    arguments.putInt("bgColor", Color.parseColor(checkoutRequest.getBackgroundColor()));
+
+                    //To make it a little darker
+                    float[] hsv = new float[3];
+                    int color = Color.parseColor(checkoutRequest.getBackgroundColor());
+                    Color.colorToHSV(color, hsv);
+                    hsv[2] *= 0.8f; // value component
+                    color = Color.HSVToColor(hsv);
+                    arguments.putInt("statusbarColor", color);
+
+                } catch (IllegalArgumentException e){
+                    throw new CheckoutRequestException("Unknown color, see Color.parseColor(String)");
+                }
+            } else {
+                throw new CheckoutRequestException("Brand color is not set! Please set the brand color.");
             }
 
             arguments.putBoolean("useTestBackend", checkoutRequest.isTestBackend());

@@ -47,10 +47,12 @@ public class MainActivity extends FragmentActivity implements AdyenCheckoutListe
         JSONObject configuration = configLoader.loadJsonConfiguration();
         CheckoutRequest checkoutRequest = new CheckoutRequest();
         try {
-            checkoutRequest.setBrandColor(R.color.nespresso_grey);
+            checkoutRequest.setBrandColor(R.color.colorAccent); //that's deprecated now. It's going to change any color anymore.
+            checkoutRequest.setBackgroundColor("#ffa904"); //Can set background from Hex String
+            checkoutRequest.setTitle("Unieuro"); //Used to set the title in the layout
             checkoutRequest.setBrandLogo(R.mipmap.nespresso_logo);
-            checkoutRequest.setCheckoutAmount(10f);
-            checkoutRequest.setCurrency(Currency.EUR);
+            checkoutRequest.setCheckoutAmount(10f); //Can pass a Double if needed
+            checkoutRequest.setCurrency(Currency.getCurrencyByString("EUR")); //Can parse eur, EUR, usd, USD & GBP, gbp
             checkoutRequest.setToken(configuration.getString("userToken"));
             checkoutRequest.setTestBackend(true);
 
