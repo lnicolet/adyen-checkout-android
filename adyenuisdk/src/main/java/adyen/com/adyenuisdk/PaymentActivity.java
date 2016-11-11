@@ -87,9 +87,6 @@ public class PaymentActivity extends Activity {
 
         if (extras.containsKey("bgColor")){
             mMerchantLogo.setBackgroundColor(extras.getInt("bgColor"));
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getWindow().setStatusBarColor(extras.getInt("bgColor")); //To make it a little darker
-            }
         }
 
         if (extras.containsKey("statusbarColor")){
