@@ -118,12 +118,16 @@ public class PaymentActivity extends Activity {
         mMerchantLogoImage = (ImageView)findViewById(R.id.application_logo);
         if (extras.containsKey("logo")){
             //Need to have the encoded String
-            byte[] decodedString = Base64.decode(extras.getString("logo"), Base64.DEFAULT);
-            Bitmap image = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-            mMerchantLogoImage.setImageBitmap(image);
+            try {
+                String logo = extras.getString("logo");
+                logo = logo.substring(logo.indexOf(',') + 1);
+                byte[] decodedString = Base64.decode(logo, Base64.DEFAULT);
+                Bitmap image = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                mMerchantLogoImage.setImageBitmap(image);
+            } catch (IllegalArgumentException e){
+                e.printStackTrace();
+            }
         }
-
-        //mMerchantLogoImage.setImageResource(extras.getInt("logo"));
 
         showInputKeyboard();
         initPaymentButtonText();
