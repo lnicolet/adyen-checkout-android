@@ -3,11 +3,14 @@ package adyen.com.adyenuisdk;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -113,7 +116,14 @@ public class PaymentActivity extends Activity {
             mOwnerNameContainer.setVisibility(View.GONE);
 
         mMerchantLogoImage = (ImageView)findViewById(R.id.application_logo);
-        mMerchantLogoImage.setImageResource(extras.getInt("logo"));
+        if (extras.containsKey("logo")){
+            //Need to have the encoded String
+            byte[] decodedString = Base64.decode(extras.getString("logo"), Base64.DEFAULT);
+            Bitmap image = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+            mMerchantLogoImage.setImageBitmap(image);
+        }
+
+        //mMerchantLogoImage.setImageResource(extras.getInt("logo"));
 
         showInputKeyboard();
         initPaymentButtonText();
@@ -172,8 +182,8 @@ public class PaymentActivity extends Activity {
         }
 
         private void initPaymentFragment() throws CheckoutRequestException {
-            if(checkoutRequest.getBrandLogo() != 0) {
-                arguments.putInt("logo", checkoutRequest.getBrandLogo());
+            if(checkoutRequest.getBrandLogo() != null) {
+                arguments.putString("logo", checkoutRequest.getBrandLogo());
             } else {
                 throw new CheckoutRequestException("Brand logo is not set! Please set the brand logo.");
             }
@@ -253,6 +263,10 @@ public class PaymentActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if (CreditCardForm.isValid()) {
+
+                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(getWindow().getCurrentFocus().getWindowToken(), 0);
+
                     final CardPaymentData cardPaymentData = buildCardData();
                     Adyen.getInstance().setToken(extras.getString("token"));
                     Adyen.getInstance().setUseTestBackend(extras.getBoolean("useTestBackend"));
@@ -324,11 +338,8 @@ public class PaymentActivity extends Activity {
      */
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK)
             adyenCheckoutListener.checkoutFailedWithError("User pressed back button.");
-
-
-        }
         return super.onKeyUp(keyCode, event);
     }
 

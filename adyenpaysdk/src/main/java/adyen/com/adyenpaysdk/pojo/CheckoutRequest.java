@@ -11,7 +11,7 @@ public class CheckoutRequest {
     private float checkoutAmount;
     private Currency currency;
     private int brandColor;
-    private int brandLogo;
+    private String brandLogo;
     private String token;
     private boolean testBackend;
     private boolean showOwnerName;
@@ -56,11 +56,11 @@ public class CheckoutRequest {
 
     public String getBackgroundColor(){ return this.bgColor; }
 
-    public int getBrandLogo() {
+    public String getBrandLogo() {
         return brandLogo;
     }
 
-    public void setBrandLogo(int brandLogo) {
+    public void setBrandLogo(String brandLogo) {
         this.brandLogo = brandLogo;
     }
 
