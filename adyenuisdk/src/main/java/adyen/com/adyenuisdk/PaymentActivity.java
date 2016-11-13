@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -44,14 +45,17 @@ public class PaymentActivity extends Activity {
 
     private TextView mPaymentAmount;
     private TextView mApplicationTitle;
+    private TextView mPaymentReference;
     private RelativeLayout mPayButton;
     private LinearLayout mPaymentForm;
-    private LinearLayout mMerchantLogo;
+    private RelativeLayout mMerchantLogo;
+    private RelativeLayout mOwnerNameContainer;
     private LinearLayout mMainLayout;
     private ImageView mMerchantLogoImage;
 
     private AdyenEditText mCreditCardNo;
     private AdyenEditText mCreditCardExpDate;
+    private AdyenEditText mCreditCardOwnerName;
     private AdyenEditText mCreditCardCvc;
 
     ViewTreeObserver.OnGlobalLayoutListener mGlobalLayoutListener;
@@ -72,16 +76,19 @@ public class PaymentActivity extends Activity {
         mPaymentAmount = (TextView)findViewById(R.id.credit_card_pay);
         mPayButton = (RelativeLayout)findViewById(R.id.pay_button);
         mPaymentForm = (LinearLayout)findViewById(R.id.payment_form_layout);
-        mMerchantLogo = (LinearLayout)findViewById(R.id.merchant_logo_layout);
+        mMerchantLogo = (RelativeLayout)findViewById(R.id.application_layout);
+        mOwnerNameContainer = (RelativeLayout)findViewById(R.id.credit_card_owner_container);
 
         mMainLayout = (LinearLayout)findViewById(R.id.main_layout);
+        mPaymentReference = (TextView)findViewById(R.id.payment_reference_number);
 
-        mApplicationTitle = (TextView)findViewById(R.id.applicationTitle);
+        mApplicationTitle = (TextView)findViewById(R.id.application_title);
         if (extras.containsKey("applicationTitle")){
             mApplicationTitle.setText(extras.getString("applicationTitle"));
         }
 
         mCreditCardNo = (AdyenEditText)findViewById(R.id.credit_card_no);
+        mCreditCardOwnerName = (AdyenEditText)findViewById(R.id.credit_card_owner);
         mCreditCardExpDate = (AdyenEditText)findViewById(R.id.credit_card_exp_date);
         mCreditCardCvc = (AdyenEditText)findViewById(R.id.credit_card_cvc);
 
@@ -95,7 +102,17 @@ public class PaymentActivity extends Activity {
             }
         }
 
-        mMerchantLogoImage = (ImageView)findViewById(R.id.merchantLogoImage);
+        if ( extras.containsKey("referenceNumber") )
+            mPaymentReference.setText("Ref: " + extras.getString("referenceNumber")); //TODO fix this
+        else
+            mPaymentReference.setVisibility(View.GONE);
+
+        if (extras.containsKey("showOwnerName"))
+            mCreditCardOwnerName.requestFocus();
+        else
+            mOwnerNameContainer.setVisibility(View.GONE);
+
+        mMerchantLogoImage = (ImageView)findViewById(R.id.application_logo);
         mMerchantLogoImage.setImageResource(extras.getInt("logo"));
 
         showInputKeyboard();
@@ -188,14 +205,7 @@ public class PaymentActivity extends Activity {
             if (checkoutRequest.getBackgroundColor() != null){
                 try {
                     arguments.putInt("bgColor", Color.parseColor(checkoutRequest.getBackgroundColor()));
-
-                    //To make it a little darker
-                    float[] hsv = new float[3];
-                    int color = Color.parseColor(checkoutRequest.getBackgroundColor());
-                    Color.colorToHSV(color, hsv);
-                    hsv[2] *= 0.8f; // value component
-                    color = Color.HSVToColor(hsv);
-                    arguments.putInt("statusbarColor", color);
+                    arguments.putInt("statusbarColor", getDarkerColor(checkoutRequest.getBackgroundColor()));
 
                 } catch (IllegalArgumentException e){
                     throw new CheckoutRequestException("Unknown color, see Color.parseColor(String)");
@@ -203,6 +213,13 @@ public class PaymentActivity extends Activity {
             } else {
                 throw new CheckoutRequestException("Brand color is not set! Please set the brand color.");
             }
+
+            if ( checkoutRequest.getReference() != null ){
+                arguments.putString("referenceNumber", checkoutRequest.getReference());
+            }
+
+            if ( checkoutRequest.getShowOwnerName() )
+                arguments.putBoolean( "showOwnerName", checkoutRequest.getShowOwnerName() );
 
             arguments.putBoolean("useTestBackend", checkoutRequest.isTestBackend());
         }
@@ -302,8 +319,36 @@ public class PaymentActivity extends Activity {
     }
 
     /*
-    * Used for unit testing
-    */
+     * This is used to let the dev know if the user quit the form by pressing back button.
+     * There wasn't any callback, so I added it.
+     */
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+            adyenCheckoutListener.checkoutFailedWithError("User pressed back button.");
+
+
+        }
+        return super.onKeyUp(keyCode, event);
+    }
+
+    /*
+     * Function to make a color a little bit darker.
+     * I use this to darker the color passed by the CheckoutRequest and set it as the
+     * StatusBar color.
+     */
+    public static int getDarkerColor(String toDarker){
+        float[] hsv = new float[3];
+        int color = Color.parseColor(toDarker);
+        Color.colorToHSV(color, hsv);
+        hsv[2] *= 0.8f;
+        color = Color.HSVToColor(hsv);
+        return color;
+    }
+
+    /*
+     * Used for unit testing
+     */
     public LinearLayout getmPaymentForm() {
         return mPaymentForm;
     }

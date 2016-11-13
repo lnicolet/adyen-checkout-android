@@ -14,8 +14,10 @@ public class CheckoutRequest {
     private int brandLogo;
     private String token;
     private boolean testBackend;
+    private boolean showOwnerName;
     private String title;
     private String bgColor;
+    private String reference;
 
 
     public float getCheckoutAmount() {
@@ -85,4 +87,12 @@ public class CheckoutRequest {
     public String getTitle(){
         return this.title;
     }
+
+    public void setReference(String ref){ this.reference = ref; }
+
+    public String getReference() { return this.reference; }
+
+    public void setShowOwnerName(boolean toShow) { this.showOwnerName = toShow; }
+
+    public boolean getShowOwnerName() { return this.showOwnerName; }
 }

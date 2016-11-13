@@ -29,6 +29,7 @@ import adyen.com.adyenuisdk.customcomponents.AdyenEditText;
 public class CreditCardForm extends LinearLayout {
 
     private AdyenEditText mCreditCardNo;
+    private AdyenEditText mCreditCardOwnerName;
     private AdyenEditText mCreditCardExpDate;
     private AdyenEditText mCreditCardCvc;
     private ImageSwitcher mCardType;
@@ -37,6 +38,7 @@ public class CreditCardForm extends LinearLayout {
     private static boolean mValidCardNumber = false;
     private static boolean mValidExpiryDate = false;
     private static boolean mValidCvc = false;
+    private static boolean mValidOwnerName = false;
 
 
     public CreditCardForm(Context context) {
@@ -46,7 +48,7 @@ public class CreditCardForm extends LinearLayout {
 
     public CreditCardForm(Context context, AttributeSet attrs) {
         super(context, attrs);
-        LayoutInflater.from(context).inflate(R.layout.credit_card_form, this);
+        LayoutInflater.from(context).inflate(R.layout.credit_card_form_new, this);
         initViews(context, attrs);
     }
 
@@ -57,6 +59,7 @@ public class CreditCardForm extends LinearLayout {
 
     private void initViews(final Context context, AttributeSet attrs) {
         mCreditCardNo = (AdyenEditText)findViewById(R.id.credit_card_no);
+        mCreditCardOwnerName = (AdyenEditText)findViewById(R.id.credit_card_owner);
         mCreditCardNo.requestFocus();
         mCreditCardExpDate = (AdyenEditText)findViewById(R.id.credit_card_exp_date);
         mCreditCardCvc = (AdyenEditText)findViewById(R.id.credit_card_cvc);
@@ -79,12 +82,15 @@ public class CreditCardForm extends LinearLayout {
 
         initFormStyle();
         initCreditCardEditText();
+        initOwnerNameEditText();
         initExpDateEditText();
         initCvcText();
     }
 
     private void initFormStyle() {
         mCreditCardNo.getBackground().setColorFilter(getResources().getColor(R.color.light_grey_border),
+                PorterDuff.Mode.SRC_ATOP);
+        mCreditCardOwnerName.getBackground().setColorFilter(getResources().getColor(R.color.light_grey_border),
                 PorterDuff.Mode.SRC_ATOP);
         mCreditCardExpDate.getBackground().setColorFilter(getResources().getColor(R.color.light_grey_border),
                 PorterDuff.Mode.SRC_ATOP);
@@ -158,6 +164,36 @@ public class CreditCardForm extends LinearLayout {
             }
         });
 
+    }
+
+    private void initOwnerNameEditText(){
+
+        mCreditCardOwnerName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length() < 5 || isNumeric(s.toString())) {
+                    mCreditCardOwnerName.setTextColor(getResources().getColor(R.color.red));
+                    mValidOwnerName = false;
+                }
+                else {
+                    mCreditCardOwnerName.setTextColor(getResources().getColor(R.color.black));
+                    mValidOwnerName = true;
+                }
+            }
+        });
+    }
+
+    public boolean isNumeric(String str)
+    {
+        return str.matches("-?\\d+(.\\d+)?");
     }
 
     private void initExpDateEditText() {
@@ -306,7 +342,12 @@ public class CreditCardForm extends LinearLayout {
         }
     }
 
+    public CreditCardForm setFocusOnOwnerName(){
+        mCreditCardOwnerName.requestFocus();
+        return this;
+    }
+
     public static boolean isValid() {
-        return mValidCardNumber && mValidExpiryDate && mValidCvc;
+        return mValidCardNumber && mValidExpiryDate && mValidCvc && mValidOwnerName;
     }
 }
