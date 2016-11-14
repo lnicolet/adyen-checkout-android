@@ -10,7 +10,7 @@ public class CheckoutResponse {
     private String paymentData;
     private float amount;
     private Currency currency;
-
+    private String reference;
 
     public String getPaymentData() {
         return paymentData;
@@ -34,6 +34,14 @@ public class CheckoutResponse {
 
     public void setCurrency(Currency currency) {
         this.currency = currency;
+    }
+
+    public void setReference(String ref){
+        this.reference = ref;
+    }
+
+    public String getReference(){
+        return this.reference;
     }
 
 }

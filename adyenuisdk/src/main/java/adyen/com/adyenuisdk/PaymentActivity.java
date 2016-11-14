@@ -283,6 +283,7 @@ public class PaymentActivity extends Activity {
                                 checkoutResponse.setPaymentData(cardPaymentData.serialize());
                                 checkoutResponse.setAmount(extras.getFloat("amount"));
                                 checkoutResponse.setCurrency(Currency.valueOf(extras.getString("currency")));
+                                checkoutResponse.setReference(extras.getString("referenceNumber"));
                                 adyenCheckoutListener.checkoutAuthorizedPayment(checkoutResponse);
                             } catch (EncrypterException e) {
                                 e.printStackTrace();
