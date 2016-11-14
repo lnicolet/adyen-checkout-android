@@ -268,6 +268,7 @@ public class PaymentActivity extends Activity {
             public void onClick(View v) {
                 if (CreditCardForm.isValid()) {
 
+                    // Hide keyboard
                     InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(getWindow().getCurrentFocus().getWindowToken(), 0);
 
@@ -303,7 +304,7 @@ public class PaymentActivity extends Activity {
     private CardPaymentData buildCardData() {
         CardPaymentData cardPaymentData = new CardPaymentData();
 
-        cardPaymentData.setCardHolderName("test");
+        cardPaymentData.setCardHolderName(mCreditCardOwnerName.getText().toString());
         cardPaymentData.setCvc(mCreditCardCvc.getText().toString());
         cardPaymentData.setExpiryMonth(mCreditCardExpDate.getText().toString().split("/")[0]);
         cardPaymentData.setExpiryYear("20" + mCreditCardExpDate.getText().toString().split("/")[1]);
@@ -342,8 +343,12 @@ public class PaymentActivity extends Activity {
      */
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK)
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
             adyenCheckoutListener.checkoutFailedWithError("User pressed back button.");
+            //Also hide keyboard
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getWindow().getCurrentFocus().getWindowToken(), 0);
+        }
         return super.onKeyUp(keyCode, event);
     }
 
