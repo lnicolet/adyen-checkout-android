@@ -1,5 +1,7 @@
 package adyen.com.pay.services;
 
+import android.content.Context;
+
 import org.json.JSONObject;
 
 /**
@@ -7,6 +9,6 @@ import org.json.JSONObject;
  */
 public interface PaymentService {
 
-    void pay(JSONObject paymentRequest, final PaymentServiceImpl.VolleyCallback callback);
+    void pay(JSONObject paymentRequest, final PaymentServiceImpl.VolleyCallback callback, Context context);
 
 }

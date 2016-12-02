@@ -1,5 +1,6 @@
 package adyen.com.adyenpaysdk;
 
+import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -46,7 +47,7 @@ public class Adyen {
         return mInstance;
     }
 
-    public void fetchPublicKey(final CompletionCallback completion) {
+    public void fetchPublicKey(final CompletionCallback completion, Context context) {
         PaymentService paymentService = new PaymentServiceImpl();
         String host = (useTestBackend) ? "test" : "live";
         String url = String.format("https://%s.adyen.com/hpp/cse/%s/json.shtml", host, token);
@@ -66,7 +67,7 @@ public class Adyen {
             public void onError(String resultCode, String message) {
                 completion.onError(message);
             }
-        });
+        }, context);
     }
 
     public String encryptData(String data) throws NoPublicKeyExeption, EncrypterException {

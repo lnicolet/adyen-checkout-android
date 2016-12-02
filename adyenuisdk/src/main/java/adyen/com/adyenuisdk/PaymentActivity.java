@@ -296,7 +296,7 @@ public class PaymentActivity extends Activity {
                         public void onError(String error) {
                             adyenCheckoutListener.checkoutFailedWithError(error);
                         }
-                    });
+                    }, getBaseContext());
                 }
             }
         });

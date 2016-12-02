@@ -1,5 +1,6 @@
 package adyen.com.pay.services;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.android.volley.Response;
@@ -28,7 +29,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public void pay(JSONObject paymentRequest, final VolleyCallback callback) {
+    public void pay(JSONObject paymentRequest, final VolleyCallback callback, Context context) {
         String paymentUrl = getPaymentUrl();
 
         Log.i(tag, "Payment url: " + paymentUrl);
@@ -46,7 +47,7 @@ public class PaymentServiceImpl implements PaymentService {
             }
         });
 
-        NetworkController.getInstance().addToRequestQueue(jsonObjectRequest);
+        NetworkController.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
     private String getPaymentUrl() {
