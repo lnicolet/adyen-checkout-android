@@ -44,8 +44,6 @@ public class MainActivity extends FragmentActivity implements AdyenCheckoutListe
     }
 
     public void initPayment(View view) {
-        ConfigLoader configLoader = new ConfigLoader();
-        JSONObject configuration = configLoader.loadJsonConfiguration();
         CheckoutRequest checkoutRequest = new CheckoutRequest();
         try {
             // checkoutRequest.setBrandColor(R.color.colorAccent); //that's deprecated now. It's going to change any color anymore.
@@ -57,13 +55,11 @@ public class MainActivity extends FragmentActivity implements AdyenCheckoutListe
             checkoutRequest.setShowOwnerName(true);
             checkoutRequest.setCheckoutAmount(10f); //Can pass a Double if needed
             checkoutRequest.setCurrency(Currency.getCurrencyByString("EUR")); //Can parse eur, EUR, usd, USD & GBP, gbp
-            checkoutRequest.setToken(configuration.getString("userToken"));
+            checkoutRequest.setToken("8714279602311541");
             checkoutRequest.setTestBackend(true);
 
             Intent intent = new PaymentActivity.PaymentActivityBuilder(checkoutRequest).build(this, context);
             startActivity(intent);
-        } catch (JSONException e) {
-            e.printStackTrace();
         } catch (CheckoutRequestException e) {
             e.printStackTrace();
         }

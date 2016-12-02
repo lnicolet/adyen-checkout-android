@@ -19,6 +19,9 @@ public class NetworkController {
     private Context context;
     private static NetworkController mInstance;
 
+    public  NetworkController () {
+    }
+
     private NetworkController(Context context)
     {
         if (this.mInstance == null){

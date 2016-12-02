@@ -12,21 +12,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import adyen.com.adyenpaysdk.controllers.NetworkController;
-import adyen.com.pay.ConfigLoader;
 
 
 /**
  * Created by andrei on 11/10/15.
  */
-public class PaymentServiceImpl implements PaymentService {
+
+class PaymentServiceImpl implements PaymentService {
 
     private static final String tag = PaymentServiceImpl.class.getSimpleName();
 
     private JSONObject configuration;
-
-    public PaymentServiceImpl() {
-        getConfiguration();
-    }
 
     @Override
     public void pay(JSONObject paymentRequest, final VolleyCallback callback, Context context) {
@@ -62,12 +58,7 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentUrl;
     }
 
-    private void getConfiguration() {
-        ConfigLoader configLoader = new ConfigLoader();
-        this.configuration = configLoader.loadJsonConfiguration();
-    }
-
-    public interface VolleyCallback {
+    interface VolleyCallback {
         void onSuccess(JSONObject result);
 
         void onError(String resultCode, String message);
